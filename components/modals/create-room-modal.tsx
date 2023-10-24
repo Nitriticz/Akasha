@@ -25,22 +25,29 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { FIleUpload } from "../file-upload";
 import { useModal } from "@/hooks/use-modal-store";
-import { createSpace } from "@/lib/firebase-querys";
+import { createRoom } from "@/lib/firebase-querys";
 
 const formSchema = z.object({
-  name: z.string().min(1, {
-    message: "Server name is required.",
-  }),
+  name: z
+    .string()
+    .min(1, {
+      message: "Server name is required.",
+    })
+    .refine((name) => name !== "general", {
+      message: "Room name cannot be 'general'",
+    }),
   imageUrl: z.string().min(1, {
     message: "Image URL is required.",
   }),
 });
 
-export const CreateServerModal = () => {
-  const { isOpen, onClose, type, userId } = useModal();
+export const CreateRoomModal = () => {
+  const { isOpen, onClose, type, data } = useModal();
   const router = useRouter();
 
-  const isModalOpen = isOpen && type === "createServer";
+  const isModalOpen = isOpen && type === "createRoom";
+
+  const { spaceId } = data;
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -53,18 +60,19 @@ export const CreateServerModal = () => {
   const isLoading = form.formState.isSubmitting;
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    const spaceData = {
-      name: values.name,
-      description: "",
-      image_path: values.imageUrl,
-      is_public: true,
-    };
+    if (spaceId) {
+      const roomData = {
+        name: values.name,
+        description: "",
+        image_path: values.imageUrl,
+      };
 
-    await createSpace(spaceData, userId);
+      await createRoom(spaceId, roomData);
 
-    form.reset();
-    router.refresh();
-    onClose();
+      form.reset();
+      router.refresh();
+      onClose();
+    }
   };
 
   const handleClose = () => {
@@ -77,11 +85,11 @@ export const CreateServerModal = () => {
       <DialogContent className="bg-white text-black p-0 overflow-hidden">
         <DialogHeader className="pt-8 px-6">
           <DialogTitle className="text-2xl text-center font-bold">
-            Customize your server
+            Create a Room
           </DialogTitle>
           <DialogDescription className="text-center text-zinc-500">
-            Gice tour server a personality with a name and an image. You can
-            always change it later
+            Rooms are spaces oriented to a certain topic so you can keep your
+            Akasha Space organized
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -95,7 +103,7 @@ export const CreateServerModal = () => {
                     <FormItem>
                       <FormControl>
                         <FIleUpload
-                          endpoint="spaces"
+                          endpoint="rooms"
                           value={field.value}
                           onChange={field.onChange}
                         />
@@ -111,13 +119,13 @@ export const CreateServerModal = () => {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="uppercase text-xs font-bold text-zinc-500 dark:text-seconday/70">
-                      Server Name
+                      Room Name
                     </FormLabel>
                     <FormControl>
                       <Input
                         disabled={isLoading}
                         className="bg-zinc-300/50 border-0 focus-visible:ring-0 text-black focus-visible:ring-offset-0"
-                        placeholder="Enter Server Name"
+                        placeholder="Enter room name"
                         {...field}
                       />
                     </FormControl>

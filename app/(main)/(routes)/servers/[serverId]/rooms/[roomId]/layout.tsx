@@ -1,5 +1,5 @@
 import { ServerSidebar } from "@/components/server/server-sidebar";
-import { getSpace } from "@/lib/get-spaces";
+import { getUserInSpace } from "@/lib/firebase-querys";
 import { initialProfile } from "@/lib/initial-profile";
 import { redirect } from "next/navigation";
 
@@ -8,19 +8,22 @@ const ServerLayout = async ({
   params,
 }: {
   children: React.ReactNode;
-  params: { serverId: string };
+  params: { serverId: string; roomId: string };
 }) => {
   const profile = await initialProfile();
-
-  if (!profile) {
-    return redirect("/api/auth/signin?callbackUrl=/");
+  const userInSpace = await getUserInSpace(params.serverId, profile.id_user);
+  if (!userInSpace) {
+    return redirect("/");
   }
 
-  const server = await getSpace(params.serverId);
   return (
-    <div>
+    <div className="h-full">
       <div className="hidden md:flex h-full w-60 z-20 flex-col fixed inset-y-0">
-        <ServerSidebar serverId={params.serverId} />
+        <ServerSidebar
+          spaceId={params.serverId}
+          roomId={params.roomId}
+          profile={profile}
+        />
       </div>
       <main className="h-full md:pl-60">{children}</main>
     </div>

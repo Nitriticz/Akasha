@@ -43,6 +43,7 @@ export const NavigationItem = ({ id, imageUrl, name }: NavigationItemProps) => {
             alt="Channel"
             priority
             style={{ objectFit: "cover" }}
+            sizes="(max-width: 48px)"
           />
         </div>
       </button>

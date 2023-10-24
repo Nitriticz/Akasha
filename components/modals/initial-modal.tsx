@@ -25,8 +25,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { FIleUpload } from "../file-upload";
-import { addDoc, collection } from "firebase/firestore";
-import { db } from "@/app/firebase";
+import { createSpace } from "@/lib/firebase-querys";
 
 const formSchema = z.object({
   name: z.string().min(1, {
@@ -56,18 +55,14 @@ export const InitialModal = ({ userId }: any) => {
   const isLoading = form.formState.isSubmitting;
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    console.log(values);
     const spaceData = {
       name: values.name,
       description: "",
       image_path: values.imageUrl,
       is_public: true,
     };
-    const serverRef = await addDoc(collection(db, "spaces"), spaceData);
-    addDoc(collection(db, "space_users"), {
-      id_space: serverRef.id,
-      id_user: userId,
-    });
+
+    await createSpace(spaceData, userId);
 
     form.reset();
     router.refresh();
@@ -101,6 +96,7 @@ export const InitialModal = ({ userId }: any) => {
                     <FormItem>
                       <FormControl>
                         <FIleUpload
+                          endpoint="spaces"
                           value={field.value}
                           onChange={field.onChange}
                         />

@@ -3,7 +3,7 @@ import { Josefin_Sans } from "next/font/google";
 import "./globals.css";
 import AuthProvider from "./context/AuthProvider";
 import { ThemeProvider } from "@/components/providers/theme-providers";
-import { ModalProvier } from "@/components/providers/modal-provider";
+import { ModalProvider } from "@/components/providers/modal-provider";
 import { cn } from "@/lib/utils";
 
 const font = Josefin_Sans({ subsets: ["latin"] });
@@ -28,7 +28,7 @@ export default async function RootLayout({
             enableSystem
             storageKey="akasha-theme"
           >
-            <ModalProvier />
+            <ModalProvider />
             {children}
           </ThemeProvider>
         </AuthProvider>

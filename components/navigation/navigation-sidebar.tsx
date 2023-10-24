@@ -1,6 +1,6 @@
 import { db } from "@/app/firebase";
 import { initialProfile } from "@/lib/initial-profile";
-import { getSpaces } from "@/lib/get-spaces";
+import { getSpaces } from "@/lib/firebase-querys";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { redirect } from "next/navigation";
 import { NavigationAction } from "./navigation-action";
@@ -27,7 +27,7 @@ export const NavigationSideBar = async () => {
   const spaces = await getSpaces(spacesQuerySnapshot);
 
   return (
-    <div className="space-y-4 flex flex-col items-center h-full text-primary w-full dark:bg-[#1E1F22] py-3">
+    <div className="space-y-4 flex flex-col items-center h-full text-primary w-full dark:bg-[#1E1F22] bg-[#E3E5E8] py-3">
       <NavigationAction userId={profile.id_user} />
       <Separator className="h-[2px] bg-zinc-300 dark:bg-zinc-700 rounded-md w-10 mx-auto" />
       <ScrollArea className="flex-1 w-full">

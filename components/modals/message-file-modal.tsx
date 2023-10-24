@@ -3,7 +3,6 @@
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { useRouter } from "next/navigation";
 
 import {
   Dialog,
@@ -18,70 +17,67 @@ import {
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { FIleUpload } from "../file-upload";
+import { serverTimestamp } from "firebase/firestore";
+import { sendMessage } from "@/lib/firebase-querys";
 import { useModal } from "@/hooks/use-modal-store";
-import { createSpace } from "@/lib/firebase-querys";
+import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
-  name: z.string().min(1, {
-    message: "Server name is required.",
-  }),
-  imageUrl: z.string().min(1, {
-    message: "Image URL is required.",
+  fileUrl: z.string().min(1, {
+    message: "Attachment is required.",
   }),
 });
 
-export const CreateServerModal = () => {
-  const { isOpen, onClose, type, userId } = useModal();
+export const MessageFileModal = () => {
+  const { isOpen, onClose, type, data } = useModal();
   const router = useRouter();
 
-  const isModalOpen = isOpen && type === "createServer";
+  const { spaceId, room, channel, profile } = data;
+
+  const isModalOpen = isOpen && type === "messageFile";
 
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: "",
-      imageUrl: "",
+      fileUrl: "",
     },
   });
-
-  const isLoading = form.formState.isSubmitting;
-
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    const spaceData = {
-      name: values.name,
-      description: "",
-      image_path: values.imageUrl,
-      is_public: true,
-    };
-
-    await createSpace(spaceData, userId);
-
-    form.reset();
-    router.refresh();
-    onClose();
-  };
 
   const handleClose = () => {
     form.reset();
     onClose();
   };
 
+  const isLoading = form.formState.isSubmitting;
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    if (profile && spaceId && room && channel) {
+      const messageData = {
+        id_user: profile.id_user,
+        text: "",
+        file_path: values.fileUrl,
+        edited: false,
+        deleted: false,
+        created_at: serverTimestamp(),
+      };
+      await sendMessage(spaceId, room.id, channel.id, messageData);
+      form.reset();
+      router.refresh();
+      onClose();
+    }
+  };
   return (
     <Dialog open={isModalOpen} onOpenChange={handleClose}>
       <DialogContent className="bg-white text-black p-0 overflow-hidden">
         <DialogHeader className="pt-8 px-6">
           <DialogTitle className="text-2xl text-center font-bold">
-            Customize your server
+            Add an atachment
           </DialogTitle>
           <DialogDescription className="text-center text-zinc-500">
-            Gice tour server a personality with a name and an image. You can
-            always change it later
+            Send a file as a message
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -90,12 +86,12 @@ export const CreateServerModal = () => {
               <div className="flex items-center justify-center text-center">
                 <FormField
                   control={form.control}
-                  name="imageUrl"
+                  name="fileUrl"
                   render={({ field }) => (
                     <FormItem>
                       <FormControl>
                         <FIleUpload
-                          endpoint="spaces"
+                          endpoint="messages"
                           value={field.value}
                           onChange={field.onChange}
                         />
@@ -105,30 +101,10 @@ export const CreateServerModal = () => {
                   )}
                 />
               </div>
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="uppercase text-xs font-bold text-zinc-500 dark:text-seconday/70">
-                      Server Name
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        disabled={isLoading}
-                        className="bg-zinc-300/50 border-0 focus-visible:ring-0 text-black focus-visible:ring-offset-0"
-                        placeholder="Enter Server Name"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
             </div>
             <DialogFooter className="bg-gray-100 px-6 py-4">
               <Button variant="primary" disabled={isLoading}>
-                Create
+                Send
               </Button>
             </DialogFooter>
           </form>

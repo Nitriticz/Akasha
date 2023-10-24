@@ -25,7 +25,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { FIleUpload } from "../file-upload";
 import { useModal } from "@/hooks/use-modal-store";
-import { createSpace } from "@/lib/firebase-querys";
+import { updateRoom } from "@/lib/firebase-querys";
+import { useEffect } from "react";
 
 const formSchema = z.object({
   name: z.string().min(1, {
@@ -36,11 +37,13 @@ const formSchema = z.object({
   }),
 });
 
-export const CreateServerModal = () => {
-  const { isOpen, onClose, type, userId } = useModal();
+export const EditRoomModal = () => {
+  const { isOpen, onClose, type, data } = useModal();
   const router = useRouter();
 
-  const isModalOpen = isOpen && type === "createServer";
+  const isModalOpen = isOpen && type === "editRoom";
+
+  const { spaceId, room } = data;
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -53,19 +56,27 @@ export const CreateServerModal = () => {
   const isLoading = form.formState.isSubmitting;
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    const spaceData = {
-      name: values.name,
-      description: "",
-      image_path: values.imageUrl,
-      is_public: true,
-    };
+    if (spaceId && room) {
+      const roomData = {
+        name: values.name,
+        description: "",
+        image_path: values.imageUrl,
+      };
 
-    await createSpace(spaceData, userId);
+      await updateRoom(spaceId, room.id, roomData);
 
-    form.reset();
-    router.refresh();
-    onClose();
+      form.reset();
+      router.refresh();
+      onClose();
+    }
   };
+
+  useEffect(() => {
+    if (room) {
+      form.setValue("name", room.name);
+      form.setValue("imageUrl", room.image_path);
+    }
+  }, [room, form]);
 
   const handleClose = () => {
     form.reset();
@@ -77,11 +88,11 @@ export const CreateServerModal = () => {
       <DialogContent className="bg-white text-black p-0 overflow-hidden">
         <DialogHeader className="pt-8 px-6">
           <DialogTitle className="text-2xl text-center font-bold">
-            Customize your server
+            Edit Room
           </DialogTitle>
           <DialogDescription className="text-center text-zinc-500">
-            Gice tour server a personality with a name and an image. You can
-            always change it later
+            Rooms are spaces oriented to a certain topic so you can keep your
+            Akasha Space organized
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -95,7 +106,7 @@ export const CreateServerModal = () => {
                     <FormItem>
                       <FormControl>
                         <FIleUpload
-                          endpoint="spaces"
+                          endpoint="rooms"
                           value={field.value}
                           onChange={field.onChange}
                         />
@@ -111,13 +122,13 @@ export const CreateServerModal = () => {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="uppercase text-xs font-bold text-zinc-500 dark:text-seconday/70">
-                      Server Name
+                      Room Name
                     </FormLabel>
                     <FormControl>
                       <Input
                         disabled={isLoading}
                         className="bg-zinc-300/50 border-0 focus-visible:ring-0 text-black focus-visible:ring-offset-0"
-                        placeholder="Enter Server Name"
+                        placeholder="Enter room name"
                         {...field}
                       />
                     </FormControl>
@@ -128,7 +139,7 @@ export const CreateServerModal = () => {
             </div>
             <DialogFooter className="bg-gray-100 px-6 py-4">
               <Button variant="primary" disabled={isLoading}>
-                Create
+                Save
               </Button>
             </DialogFooter>
           </form>

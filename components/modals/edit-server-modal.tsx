@@ -3,7 +3,7 @@
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 
 import {
   Dialog,
@@ -25,7 +25,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { FIleUpload } from "../file-upload";
 import { useModal } from "@/hooks/use-modal-store";
-import { createSpace } from "@/lib/firebase-querys";
+import { useEffect } from "react";
+import { updateSpace } from "@/lib/firebase-querys";
 
 const formSchema = z.object({
   name: z.string().min(1, {
@@ -36,11 +37,12 @@ const formSchema = z.object({
   }),
 });
 
-export const CreateServerModal = () => {
-  const { isOpen, onClose, type, userId } = useModal();
+export const EditServerModal = () => {
+  const { isOpen, onClose, type, data } = useModal();
   const router = useRouter();
 
-  const isModalOpen = isOpen && type === "createServer";
+  const isModalOpen = isOpen && type === "editServer";
+  const { spaceId, space } = data;
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -50,17 +52,17 @@ export const CreateServerModal = () => {
     },
   });
 
+  useEffect(() => {
+    if (space) {
+      form.setValue("name", space.name);
+      form.setValue("imageUrl", space.image_path);
+    }
+  }, [space, form]);
+
   const isLoading = form.formState.isSubmitting;
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    const spaceData = {
-      name: values.name,
-      description: "",
-      image_path: values.imageUrl,
-      is_public: true,
-    };
-
-    await createSpace(spaceData, userId);
+    spaceId && (await updateSpace(spaceId, values));
 
     form.reset();
     router.refresh();
@@ -128,7 +130,7 @@ export const CreateServerModal = () => {
             </div>
             <DialogFooter className="bg-gray-100 px-6 py-4">
               <Button variant="primary" disabled={isLoading}>
-                Create
+                Save
               </Button>
             </DialogFooter>
           </form>
