@@ -8,7 +8,7 @@ import { NavigationItem } from "./navigation-item";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ThemeToggle } from "../theme-toggle";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { UserAction } from "../user-action";
 
 export const NavigationSideBar = async () => {
   const profile = await initialProfile();
@@ -27,7 +27,7 @@ export const NavigationSideBar = async () => {
   const spaces = await getSpaces(spacesQuerySnapshot);
 
   return (
-    <div className="space-y-4 flex flex-col items-center h-full text-primary w-full dark:bg-[#1E1F22] bg-[#E3E5E8] py-3">
+    <div className="space-y-4 flex flex-col items-center h-full text-primary w-full py-3 bg-gradient-to-b bg-[#E3E5E8] dark:bg-[#1E1F22]">
       <NavigationAction userId={profile.id_user} />
       <Separator className="h-[2px] bg-zinc-300 dark:bg-zinc-700 rounded-md w-10 mx-auto" />
       <ScrollArea className="flex-1 w-full">
@@ -41,12 +41,10 @@ export const NavigationSideBar = async () => {
           </div>
         ))}
       </ScrollArea>
+      <Separator className="h-[2px] bg-zinc-300 dark:bg-zinc-700 rounded-md w-10 mx-auto" />
       <div className="pb-3 mt-auto flex items-center flex-col gap-y-4">
         <ThemeToggle />
-        <Avatar>
-          <AvatarImage src={profile.image_path} />
-          <AvatarFallback>PP</AvatarFallback>
-        </Avatar>
+        <UserAction profile={profile} />
       </div>
     </div>
   );

@@ -404,7 +404,7 @@ export const createRoom = async (
   );
 
   const textChannelData = {
-    name: "gemeral",
+    name: "general",
     type: "text",
   };
   await addDoc(

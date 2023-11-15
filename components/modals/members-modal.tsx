@@ -132,7 +132,17 @@ export const MembersModal = () => {
               <div className="flex flex-col gap-y-1">
                 <div className="text-xs font-semibold flex items-center gap-x-3">
                   {member.nickname}
-                  <Badge className="bg-emerald-500 text-white hover:bg-emerald-600">
+                  <Badge
+                    className={cn(
+                      "text-white",
+                      member.role?.color === "green" &&
+                        "bg-emerald-500 hover:bg-emerald-600",
+                      member.role?.color === "red" &&
+                        "bg-rose-500 hover:bg-rose-600",
+                      member.role?.color === "blue" &&
+                        "bg-indigo-500 hover:bg-indigo-600"
+                    )}
+                  >
                     {member.role?.name}
                   </Badge>
                 </div>

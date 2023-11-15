@@ -71,6 +71,7 @@ export const RoomSearch = ({
         where("type", "==", "text")
       )
     );
+
     const channel = spaceRoomChannelsQuerySnapshot.docs[0].id;
     return router.push(
       `/servers/${params?.serverId}/rooms/${idRoom}/channels/${channel}`
@@ -88,7 +89,7 @@ export const RoomSearch = ({
           Search Rooms
         </p>
         <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground ml-auto">
-          <span className="text-xs">Ctrl</span>K
+          <span className="text-xs">⌘</span>K
         </kbd>
       </button>
       <CommandDialog open={open} onOpenChange={setOpen}>

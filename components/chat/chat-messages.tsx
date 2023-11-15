@@ -2,7 +2,7 @@
 
 import { DocumentData, Timestamp } from "firebase-admin/firestore";
 import { ChatWelcome } from "./chat-welcome";
-import { collection, limit, orderBy, query } from "firebase/firestore";
+import { collection, orderBy, query } from "firebase/firestore";
 import { db } from "@/app/firebase";
 import { useCollection } from "react-firebase-hooks/firestore";
 import { ChatItem } from "./chat-item";

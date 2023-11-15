@@ -23,6 +23,16 @@ const formSchema = z.object({
   content: z.string().min(1),
 });
 
+interface RoleSchema {
+  name: string;
+  color: string;
+  is_admin: boolean;
+  rooms?: boolean | undefined;
+  channels?: boolean | undefined;
+  delete_messages?: boolean | undefined;
+  kick?: boolean | undefined;
+}
+
 export const ChatItem = ({
   message,
   spaceId,
@@ -88,7 +98,11 @@ export const ChatItem = ({
   const [isEditing, setIsEditing] = useState(false);
   const [nickname, setNickname] = useState("");
   const [userImg, setUserImg] = useState("");
-  const [role, setRole] = useState("");
+  const [role, setRole] = useState<RoleSchema>({
+    name: "",
+    color: "",
+    is_admin: false,
+  });
   const [canDeleteMessage, setCanDeleteMessage] = useState(
     profile.id_user === message.id_user && !message.deleted
   );
@@ -99,8 +113,9 @@ export const ChatItem = ({
     setNickname(res.nickname);
     setUserImg(res.image_path);
   });
-  getRole(profile.id_user, spaceId).then((res) => {
-    setRole(res.name);
+
+  getRole(message.id_user, spaceId).then((res) => {
+    setRole(res);
     (res.delete_messages || res.is_admin) &&
       !message.deleted &&
       setCanDeleteMessage(true);
@@ -131,11 +146,19 @@ export const ChatItem = ({
                   {nickname}
                 </p>
               )}
-              {role === "" ? (
+              {role.name === "" ? (
                 <Skeleton className="w-[40px] bg-zinc-500 h-4 -mt-[4px] ml-2" />
               ) : (
-                <Badge className="bg-emerald-500 text-white hover:bg-emerald-600 h-4 -mt-[4px] ml-2">
-                  {role}
+                <Badge
+                  className={cn(
+                    "text-white h-4 -mt-[4px] ml-2",
+                    role.color === "green" &&
+                      "bg-emerald-500 hover:bg-emerald-600",
+                    role.color === "red" && "bg-rose-500 hover:bg-rose-600",
+                    role.color === "blue" && "bg-indigo-500 hover:bg-indigo-600"
+                  )}
+                >
+                  {role.name}
                 </Badge>
               )}
             </div>
