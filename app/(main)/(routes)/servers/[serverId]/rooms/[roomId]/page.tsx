@@ -2,10 +2,9 @@ import { db } from "@/app/firebase";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { redirect } from "next/navigation";
 
-export const RoomPage = async ({
+const RoomPage = async ({
   params,
 }: {
-  children: React.ReactNode;
   params: { serverId: string; roomId: string };
 }) => {
   const spaceRoomChannelsQuerySnapshot = await getDocs(

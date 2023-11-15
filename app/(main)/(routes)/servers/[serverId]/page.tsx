@@ -2,12 +2,7 @@ import { db } from "@/app/firebase";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { redirect } from "next/navigation";
 
-const ServerPage = async ({
-  params,
-}: {
-  children: React.ReactNode;
-  params: { serverId: string };
-}) => {
+const ServerPage = async ({ params }: { params: { serverId: string } }) => {
   const spaceRoomsQuerySnapshot = await getDocs(
     query(
       collection(db, `spaces/${params.serverId}/rooms`),
