@@ -58,7 +58,7 @@ export const ChatInput = ({
   const isLoading = form.formState.isSubmitting;
 
   const onSubmit = async (value: z.infer<typeof formSchema>) => {
-    const messageData = {
+    let messageData = {
       id_user: profile.id_user,
       text: value.content,
       file_path: "",
@@ -66,6 +66,40 @@ export const ChatInput = ({
       deleted: false,
       created_at: serverTimestamp(),
     };
+
+    if (value.content.substring(0, 1) == "/") {
+      switch (value.content) {
+        case "/weather":
+          let msg = "";
+          messageData.file_path = "weather";
+          await fetch(
+            "https://api.openweathermap.org/data/2.5/weather?lat=-33.5000852&lon=-70.6162928&appid=162d41a40bb7f0e639ead952a9e598ee&units=metric"
+          )
+            .then((res) => res.json())
+            .then((data) => {
+              msg =
+                data.name +
+                ";" +
+                data.sys.country +
+                ";" +
+                data.weather[0].description +
+                ";" +
+                data.main.temp +
+                ";" +
+                data.main.feels_like +
+                ";" +
+                data.main.humidity +
+                ";" +
+                data.wind.speed +
+                ";" +
+                data.main.pressure +
+                ";" +
+                data.weather[0].icon;
+              messageData.text = msg;
+            });
+      }
+    }
+
     await sendMessage(spaceId, room.id, channel.id, messageData);
     form.reset();
   };

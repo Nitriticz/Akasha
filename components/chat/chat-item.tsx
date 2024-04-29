@@ -125,6 +125,51 @@ export const ChatItem = ({
     message.file_path !== "" && message.file_path.includes("images");
   const isDocument =
     message.file_path !== "" && message.file_path.includes("documents");
+  const isWeather =
+    message.file_path !== "" && message.file_path.includes("weather");
+
+  let weatherData = {
+    name: "",
+    country: "",
+    description: "",
+    temp: 1,
+    feels_like: 1,
+    humidity: 1,
+    wind_speed: 1,
+    pressure: 1,
+    icon: "",
+    iconUrl: "",
+  };
+
+  if (isWeather) {
+    var indexes = [],
+      i = -1;
+    while ((i = message.text.indexOf(";", i + 1)) >= 0) indexes.push(i);
+    weatherData.name = message.text.substring(0, indexes[0]);
+    weatherData.country = message.text.substring(indexes[0] + 1, indexes[1]);
+    weatherData.description = message.text.substring(
+      indexes[1] + 1,
+      indexes[2]
+    );
+    weatherData.temp = parseFloat(
+      message.text.substring(indexes[2] + 1, indexes[3])
+    );
+    weatherData.feels_like = parseFloat(
+      message.text.substring(indexes[3] + 1, indexes[4])
+    );
+    weatherData.humidity = parseFloat(
+      message.text.substring(indexes[4] + 1, indexes[5])
+    );
+    weatherData.wind_speed = parseFloat(
+      message.text.substring(indexes[5] + 1, indexes[6])
+    );
+    weatherData.pressure = parseFloat(
+      message.text.substring(indexes[6] + 1, indexes[7])
+    );
+    weatherData.icon = message.text.substring(indexes[7] + 1);
+    weatherData.iconUrl =
+      "https://openweathermap.org/img/wn/" + weatherData.icon + "@2x.png";
+  }
 
   return (
     <div className="relative group flex items-center hover:bg-black/5 p-4 transition w-full">
@@ -198,6 +243,86 @@ export const ChatItem = ({
               >
                 Document File
               </a>
+            </div>
+          )}
+          {isWeather && (
+            <div
+              className={cn(
+                "w-[500px] h-[250px] bg-gradient-to-tr shadow-lg rounded-xl relative px-6 top-[10%] mt-2",
+                weatherData.icon === "01d" &&
+                  "from-sky-300 to-sky-100 text-black",
+                weatherData.icon === "01n" &&
+                  "from-slate-900 to-indigo-900 text-white",
+                weatherData.icon === "02d" &&
+                  "from-gray-400 to-sky-100 text-black",
+                weatherData.icon === "02n" &&
+                  "from-gray-950 to-slate-700 text-white",
+                ["03d", "04d", "09d", "10d", "11d", "13d", "50d"].includes(
+                  weatherData.icon
+                ) && "from-gray-400 to-slate-200 text-black",
+                ["03n", "04n", "09n", "10n", "11n", "13n", "50n"].includes(
+                  weatherData.icon
+                ) && "from-gray-950 to-gray-800 text-white"
+              )}
+            >
+              <div className="flex justify-between w-full">
+                <div className="w-1/2 my-4 mx-auto flex justify-between items-center">
+                  <div className="flex flex-col items-start justify-between h-full">
+                    <div>
+                      <p className="text-xl">
+                        {weatherData.name}, {weatherData.country}
+                      </p>
+                      <p className="text-sm">
+                        {weatherData.description.charAt(0).toUpperCase() +
+                          weatherData.description.slice(1)}
+                      </p>
+                    </div>
+                    <div>
+                      <h1 className="text-6xl font-semibold">
+                        {weatherData.temp.toFixed()}°C
+                      </h1>
+                    </div>
+                  </div>
+                </div>
+                <div className="w-1/2 flex flex-col justify-between items-end">
+                  <div className="relative h-[128px] w-[128px]">
+                    <Image
+                      fill
+                      src={weatherData.iconUrl}
+                      alt="wIcon"
+                      priority
+                      className="object-cover"
+                      sizes="(max-width: 128px)"
+                    />
+                  </div>
+                  <div className="flex flex-col justify-evenly gap-y-2 my-4 mx-auto text-xs">
+                    <div className="flex justify-between gap-x-8">
+                      <p>Feels Like</p>
+                      <p className="font-bold w-20">
+                        {weatherData.feels_like.toFixed()}°C
+                      </p>
+                    </div>
+                    <div className="flex justify-between gap-x-8">
+                      <p>Humidity</p>
+                      <p className="font-bold w-20">
+                        {weatherData.humidity.toFixed()} %
+                      </p>
+                    </div>
+                    <div className="flex justify-between gap-x-8">
+                      <p>Wind Speed</p>
+                      <p className="font-bold w-20">
+                        {weatherData.wind_speed.toFixed()} KPH
+                      </p>
+                    </div>
+                    <div className="flex justify-between gap-x-8">
+                      <p>Pressure</p>
+                      <p className="font-bold w-20">
+                        {weatherData.pressure.toFixed()} hPa
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           )}
           {message.file_path === "" && !isEditing && (
