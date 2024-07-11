@@ -15,7 +15,8 @@ export type ModalType =
   | "editRoom"
   | "deleteRoom"
   | "messageFile"
-  | "deleteMessage";
+  | "deleteMessage"
+  | "subscribe";
 
 interface ModalData {
   space?: DocumentData;
@@ -41,6 +42,7 @@ interface ModalData {
         image_path: string | null | undefined;
         nickname: string | null | undefined;
         description: string;
+        subscribed?: boolean;
       };
   role?: DocumentData | undefined;
   typeChannel?: string;

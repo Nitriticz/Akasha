@@ -11,8 +11,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { LogOut, Settings, User } from "lucide-react";
+import { LogOut, Settings, User, Crown } from "lucide-react";
 import { DocumentData } from "firebase-admin/firestore";
+
+import { useModal } from "@/hooks/use-modal-store";
 
 export const UserAction = ({
   profile,
@@ -24,8 +26,11 @@ export const UserAction = ({
         image_path: string | null | undefined;
         nickname: string | null | undefined;
         description: string;
+        subscribed: boolean;
       };
 }) => {
+  const { onOpen } = useModal();
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -41,6 +46,12 @@ export const UserAction = ({
           <DropdownMenuItem>
             <User className="mr-2 h-4 w-4" />
             <span>Profile</span>
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => onOpen("", "subscribe", { profile })}
+          >
+            <Crown className="mr-2 h-4 w-4" />
+            <span>AkashaPlus</span>
           </DropdownMenuItem>
           <DropdownMenuItem>
             <Settings className="mr-2 h-4 w-4" />

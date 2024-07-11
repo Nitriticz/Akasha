@@ -31,6 +31,7 @@ export const initialProfile = async () => {
     image_path: session?.user?.image,
     nickname: session?.user?.name,
     description: "Hey there, I'm using Akasha!",
+    subscribed: false,
   };
   await addDoc(collection(db, "profiles"), data);
 

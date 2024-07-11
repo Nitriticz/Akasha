@@ -5,6 +5,7 @@ import AuthProvider from "./context/AuthProvider";
 import { ThemeProvider } from "@/components/providers/theme-providers";
 import { ModalProvider } from "@/components/providers/modal-provider";
 import { cn } from "@/lib/utils";
+import { Toaster } from "@/components/ui/toaster";
 
 const font = Josefin_Sans({ subsets: ["latin"] });
 
@@ -32,6 +33,7 @@ export default async function RootLayout({
             {children}
           </ThemeProvider>
         </AuthProvider>
+        <Toaster />
       </body>
     </html>
   );

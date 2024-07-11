@@ -491,6 +491,7 @@ export const getProfile = async (userId: string) => {
     nickname: string;
     description: string;
     image_path: string;
+    subscribed: boolean;
   };
   const q = query(collection(db, "profiles"), where("id_user", "==", userId));
   const profileSnapshot = await getDocs(q);
@@ -500,6 +501,7 @@ export const getProfile = async (userId: string) => {
     nickname: profileSnapshot.docs[0].data()?.nickname,
     description: profileSnapshot.docs[0].data()?.description,
     image_path: profileSnapshot.docs[0].data()?.image_path,
+    subscribed: profileSnapshot.docs[0].data()?.subscribed,
   };
 
   return profile;
@@ -575,4 +577,26 @@ export const deleteMessage = async (
     ),
     messageData
   );
+};
+
+export const subscribeUser = async (userId: string) => {
+  let profile: {
+    id_user: string;
+    nickname: string;
+    description: string;
+    image_path: string;
+    subscribed: boolean;
+  };
+  const q = query(collection(db, "profiles"), where("id_user", "==", userId));
+  const profileSnapshot = await getDocs(q);
+  const id_profile = profileSnapshot.docs[0].id;
+  profile = {
+    id_user: profileSnapshot.docs[0].data()?.id_user,
+    nickname: profileSnapshot.docs[0].data()?.nickname,
+    description: profileSnapshot.docs[0].data()?.description,
+    image_path: profileSnapshot.docs[0].data()?.image_path,
+    subscribed: true,
+  };
+
+  await updateDoc(doc(db, `profiles/${id_profile}`), profile);
 };

@@ -16,6 +16,7 @@ import { EditRoomModal } from "@/components/modals/edit-room-modal";
 import { DeleteRoomModal } from "@/components/modals/delete-room-modal";
 import { MessageFileModal } from "@/components/modals/message-file-modal";
 import { DeleteMessageModal } from "@/components/modals/delete-message-modal";
+import { SubscriptionModal } from "@/components/modals/subscription-modal";
 
 export const ModalProvider = () => {
   const [isMounted, setIsMounted] = useState(false);
@@ -44,6 +45,7 @@ export const ModalProvider = () => {
       <DeleteRoomModal />
       <MessageFileModal />
       <DeleteMessageModal />
+      <SubscriptionModal />
     </>
   );
 };
